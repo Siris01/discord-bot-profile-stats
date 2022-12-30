@@ -50,6 +50,9 @@ DISCORD_CLIENT_SECRET: <your OAuth2 client secret>
 DISCORD_TOKEN: <your bot token>
 DISCORD_REDIRECT_URI: https://<your-project-url>/discord-oauth-callback
 COOKIE_SECRET: <random generated UUID>
+BOT_ID: <your bot's user ID>
+PLATFORM_NAME: <your platform name>
+STATS_API: <stats API URL of your bot>
 ```
 
 For the UUID (`COOKIE_SECRET`), you can run the following commands:

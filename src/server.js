@@ -1,5 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import fetch from 'node-fetch';
 
 import config from './config.js';
 import * as discord from './discord.js';
@@ -16,7 +17,8 @@ import * as storage from './storage.js';
   * Just a happy little route to show our server is up.
   */
  app.get('/', (req, res) => {
-   res.send('👋');
+  if (!isOwner(req)) res.send('no');
+  else res.send('👋');
  });
 
 /**
@@ -26,6 +28,8 @@ import * as storage from './storage.js';
  * and redirect the user there.
  */
 app.get('/linked-role', async (req, res) => {
+  if (!isOwner(req)) return res.sendStatus(403);
+
   const { url, state } = discord.getOAuthUrl();
 
   // Store the signed state param in the user's cookies so we can verify
@@ -47,6 +51,8 @@ app.get('/linked-role', async (req, res) => {
  * 4. Lets the user know it's all good and to go back to Discord
  */
  app.get('/discord-oauth-callback', async (req, res) => {
+  if (!isOwner(req)) return res.sendStatus(403);
+
   try {
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     const code = req.query['code'];
@@ -86,6 +92,8 @@ app.get('/linked-role', async (req, res) => {
  * data to Discord.
  */
  app.post('/update-metadata', async (req, res) => {
+  if (!isOwner(req)) return res.sendStatus(403);
+
   try {
     const userId = req.body.userId;
     await updateMetadata(userId)
@@ -110,10 +118,15 @@ async function updateMetadata(userId) {
     // This data could be POST-ed to this endpoint, but every service
     // is going to be different.  To keep the example simple, we'll
     // just generate some random data. 
+
+    const stats = await (await fetch(process.env.STATS_API)).json();
+    
     metadata = {
-      cookieseaten: 1483,
-      allergictonuts: 0, // 0 for false, 1 for true
-      firstcookiebaked: '2003-12-20',
+      votes: stats.votes,
+      guilds: stats.guilds, 
+      members: stats.members,
+      invites: stats.invites,
+      shards: stats.shards
     };
   } catch (e) {
     e.message = `Error fetching external data: ${e.message}`;
@@ -133,3 +146,7 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+const isOwner = (req) => {
+  return req.cookies.AUTH === config.AUTH_COOKIE;
+}
