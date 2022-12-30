@@ -119,7 +119,13 @@ async function updateMetadata(userId) {
     // is going to be different.  To keep the example simple, we'll
     // just generate some random data. 
 
-    const stats = await (await fetch(process.env.STATS_API)).json();
+    const stats = await (await fetch(config.STATS_API, {
+      headers: {
+        'User-Agent': 'PostmanRuntime/7.30.0',
+        "Accept": "*/*",
+        "Host": config.STATS_API.replace("https://", "").split("/")[0],
+      }
+    })).json();
     
     metadata = {
       votes: stats.votes,

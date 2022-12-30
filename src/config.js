@@ -14,6 +14,7 @@ const config = {
   COOKIE_SECRET: process.env.COOKIE_SECRET,
   BOT_ID: process.env.BOT_ID,
   AUTH_COOKIE: process.env.AUTH_COOKIE,
+  STATS_API: process.env.STATS_API,
 };
 
 export default config;
