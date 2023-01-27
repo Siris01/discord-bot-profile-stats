@@ -120,7 +120,8 @@ export async function pushMetadata(userId, tokens, metadata) {
   const url = `https://discord.com/api/v10/users/@me/applications/${config.DISCORD_CLIENT_ID}/role-connection`;
   const accessToken = await getAccessToken(userId, tokens);
   const body = {
-    platform_name: process.env.PLATFORM_NAME || 'Stats',
+    platform_name: process.env.PLATFORM_NAME,
+    platform_username: process.env.PLATFORM_USERNAME,
     metadata,
   };
   const response = await fetch(url, {
